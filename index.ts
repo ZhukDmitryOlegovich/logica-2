@@ -15,7 +15,7 @@ Array.from(
 	console.log(style.gray('==>'), style.cyan(desc), style.gray(`(${num})`))
 
 	const rules = fs
-		.readFileSync(`./rule2_${num}.txt`, { encoding: 'utf8' })
+		.readFileSync(`./files/rule2_${num}.txt`, { encoding: 'utf8' })
 		.split('\n')
 		.map((s) => s.replace(/\s*\/\/.*/, '').trim())
 		.filter(Boolean)
@@ -43,7 +43,7 @@ Array.from(
 		>);
 
 	const tests = fs
-		.readFileSync(`./exam2_${num}.txt`, { encoding: 'utf8' })
+		.readFileSync(`./files/exam2_${num}.txt`, { encoding: 'utf8' })
 		.split('\n')
 		.map((s) => s.replace(/\s*\/\/.*/, '').trim())
 		.filter(Boolean)
