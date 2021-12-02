@@ -1,16 +1,17 @@
 import fs from 'fs';
 import style from 'chalk';
 
+const count = +process.argv[2];
+
 Array.from(
-[
-	'g₁(m, n) = |m - n|',
-	'g₂(a) = sg(a)',
-	'g₃(n) = 5 + n'
-]
-// or use:
-// {length: 3} 
-)
-.forEach((desc = '\b', num) => {
+	count
+		? { length: count }
+		: [
+			'g₁(m, n) = |m - n|',
+			'g₂(a) = sg(a)',
+			'g₃(n) = 5 + n'
+		]
+).forEach((desc = '\b', num) => {
 	num += 1;
 	console.log(style.gray('==>'), style.cyan(desc), style.gray(`(${num})`))
 
