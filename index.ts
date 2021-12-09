@@ -1,10 +1,12 @@
-import fs from 'fs';
+/* eslint-disable no-console */
 import style from 'chalk';
+import fs from 'fs';
 
-const COUNT = process.env['COUNT'];
-const TIMEOUT = +(process.env['TIMEOUT'] ?? 100);
-const smallNum = ['₀₁₂₃₄₅₆₇₈₉'];
-const minusOp = '∸';
+const { COUNT } = process.env;
+const DEBAG = !!process.env.DEBAG;
+const TIMEOUT = +(process.env.TIMEOUT ?? 100);
+// const smallNum = ['₀₁₂₃₄₅₆₇₈₉'];
+// const minusOp = '∸';
 
 Array.from(
 	COUNT
@@ -12,11 +14,11 @@ Array.from(
 		: [
 			'g₁(m, n) = |m - n|',
 			'g₂(m) = sg(m)',
-			'g₃(m) = 5 + m'
-		]
+			'g₃(m) = 5 + m',
+		],
 ).forEach((desc = '\b', num) => {
 	num += 1;
-	console.log(style.gray('==>'), style.cyan(desc), style.gray(`(${num})`))
+	console.log(style.gray('==>'), style.cyan(desc), style.gray(`(${num})`));
 
 	let globalOk = true;
 
@@ -28,11 +30,9 @@ Array.from(
 			.filter(Boolean)
 			.map((s) => s
 				.split('->')
-				.map((s) => s
+				.map((ss) => ss
 					.trim()
-					.split(/\s+/)!
-				)
-			)
+					.split(/\s+/)!))
 			.reduce((accum, [[sc, vc], [newsc, newvc, move]]) => {
 				accum[sc] ??= {};
 				if (vc in accum[sc]) {
@@ -55,8 +55,7 @@ Array.from(
 			.filter(Boolean)
 			.map((s) => s
 				.split('->')
-				.map((s) => s.trim())
-			) as [string, string][];
+				.map((ss) => ss.trim())) as [string, string][];
 
 		globalOk = tests.reduce<boolean>((status, [test, res]) => {
 			const start = Date.now();
@@ -65,7 +64,7 @@ Array.from(
 			let pos = length;
 			const arr = Array.from({ length }, () => '').concat(...test.split(''));
 			let sc = '01';
-			process.stdout.write(style.gray('input: ') + test + '; ');
+			// process.stdout.write(style.gray('input: ') + test + '; ');
 			while (sc !== '.') {
 				if (Date.now() - start > TIMEOUT) {
 					throw new Error('timeout - meybe inf loop');
@@ -76,11 +75,11 @@ Array.from(
 					console.log(
 						style.red('fail:'),
 						'[',
-						style.green("'" + test + "'") + ',',
-						style.green("'" + res + "'") + ',',
-						style.red("'" + arr.join('').replace(/^"+|"+$/g, '') + "'") + ',',
-						style.yellow(pos - arr.findIndex((v) => v && v !== '"')) + ',',
-						'status:', style.green("'" + sc + "'") + ',',
+						`${style.green(`'${test}'`)},`,
+						`${style.green(`'${res}'`)},`,
+						`${style.red(`'${arr.join('').replace(/^"+|"+$/g, '')}'`)},`,
+						`${style.yellow(pos - arr.findIndex((v) => v && v !== '"'))},`,
+						'status:', `${style.green(`'${sc}'`)},`,
 						'rule:', style.bold('null'),
 						']',
 					);
@@ -105,14 +104,16 @@ Array.from(
 			const isOk = ans === res && arr.findIndex((v) => v && v !== '"') === pos;
 			console.log(
 				isOk ? style.green('ok:') : style.red('FAIL:'),
-				[test, res, ans, pos - arr.findIndex((v) => v && v !== '"')]
+				[test, res, ans, pos - arr.findIndex((v) => v && v !== '"')],
 			);
 			return status && isOk;
 		}, true);
 
 		if (!globalOk) {
 			console.log(style.red('FIND FAIL'));
-			console.log(rules);
+			if (DEBAG) {
+				console.log(rules);
+			}
 			process.exitCode = 1;
 		} else {
 			console.log(style.green('ALL OKEY'));
@@ -123,5 +124,6 @@ Array.from(
 	}
 
 	process.exitCode ??= 0;
+	// eslint-disable-next-line no-bitwise
 	process.exitCode |= 1 - +globalOk;
 });
