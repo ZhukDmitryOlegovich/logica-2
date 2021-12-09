@@ -85,8 +85,8 @@
 
 		btnsExample.forEach(
 			({ id }, i) => Promise.all([
-				fetch(`/rule/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
-				fetch(`/test/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
+				fetch(`./rule/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
+				fetch(`./test/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
 			]).then(([rule, test]) => {
 				// console.log([id, i, rule]);
 				btnsExample[i].onclick = () => {
