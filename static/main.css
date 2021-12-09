@@ -1,0 +1,89 @@
+body {
+	padding: 10px;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+h1 {
+	font-size: 3em;
+	margin: 0.5em 0;
+}
+
+h2 {
+	font-size: 2em;
+	margin: 0.25em 0;
+}
+
+h3 {
+	font-size: 1.5em;
+}
+
+.wrap-row {
+	display: flex;
+	flex-flow: row nowrap;
+}
+
+.wrap-column {
+	display: flex;
+	flex-flow: column nowrap;
+}
+
+button {
+	margin: 5px;
+}
+
+#example > button {
+	font-family: monospace;
+	width: 70px;
+}
+
+#console .date {
+	color: #a5a5a5;
+}
+
+#console .okey {
+	color: white;
+	background-color: darkgreen;
+}
+
+#console .fail {
+	color: white;
+	background-color: red;
+}
+
+#console .info {
+	color: white;
+	background-color: gray;
+}
+
+#console .arrow {
+	color: cornflowerblue;
+	font-weight: bold;
+}
+
+#console .string {
+	color: darkgreen;
+}
+
+#console .bad-string {
+	color: red;
+}
+
+#console .number {
+	color: orange;
+}
+
+#console .local-ok {
+	color: darkgreen;
+}
+
+#console .local-fail {
+	color: red;
+}
+
+#console .fatal-fail {
+	color: white;
+	background-color: #9b0000;
+}

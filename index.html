@@ -1,12 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
+	<link rel="stylesheet" href="./static/reset.css">
+	<link rel="stylesheet" href="./static/main.css">
+	<title>Решение ДЗ по логике</title>
 </head>
+
 <body>
-	<h1>Hello World!</h1>
+	<div class="wrap-row" style="width: min-content;">
+		<div style="width: 500px;">
+			<h1>Решение ДЗ по логике</h1>
+			<h2>Задание №2 (Машина Тьюринга)</h2>
+		</div>
+		<div id="example" style="width: 500px; flex-wrap: wrap; user-select: none;">
+			<p>Примеры: <a href="" target="_blank">[добавить свой пример]</a></p>
+			<button id="add-5" disabled>m + 5</button>
+			<button id="sg" disabled> sg(m) </button>
+			<button id="abs-sub" disabled>|m - n|</button>
+		</div>
+		<table id="input" style="width: 500px; flex-wrap: wrap; user-select: none;">
+			<tr>
+				<td>Стартовое состояние: </td>
+				<td>
+					<input type="text" id="inp-start" placeholder="01">
+				</td>
+			</tr>
+			<tr>
+				<td>Конечное состояние: </td>
+				<td>
+					<input type="text" id="inp-stop" placeholder=".">
+				</td>
+			</tr>
+			<tr>
+				<td>Timeout: </td>
+				<td>
+					<input type="number" id="inp-timeout" placeholder="100">
+				</td>
+			</tr>
+		</table>
+	</div>
+	<div class="wrap-row" style="height: 500px">
+		<div>
+			<div class="wrap-row" style="user-select: none;">
+				<button id="btn-save-rule">Сохранить правило</button>
+				<button id="btn-load-rule" onclick="this.children[0].click()">Загрузить правило
+					<input type="file" accept=".txt, .md" style="display: none;">
+				</button>
+				<a href="" style="margin: 8px;">Документация</a>
+			</div>
+			<textarea style="resize: vertical; width: 500px; min-height: 200px;" id="rule"></textarea>
+		</div>
+		<div>
+			<div class="wrap-row" style="user-select: none;">
+				<button id="btn-save-test">Сохранить тест</button>
+				<button id="btn-load-test" onclick="this.children[0].click()">Загрузить тест
+					<input type="file" accept=".txt, .md" style="display: none;">
+				</button>
+			</div>
+			<textarea style="resize: none; width: 500px; min-height: 200px;" id="test"></textarea>
+		</div>
+		<div>
+			<div class="wrap-row" style="user-select: none;">
+				<button id="btn-run-test" disabled>Запустить тест</button>
+				<button id="btn-stop-test" disabled>Остановить тест</button>
+				<button id="btn-clear-test">Очистить консоль</button>
+			</div>
+			<p style="width: 500px; border: 1px solid #767676; overflow-y: scroll; font-family: monospace; white-space: pre-wrap;"
+				id="console"></p>
+		</div>
+	</div>
+	<script type="module">
+		const taRule = document.getElementById('rule');
+		const taTest = document.getElementById('test');
+		const pConsole = document.getElementById('console');
+		const divExample = document.getElementById('example');
+
+		const btnsExample = [...divExample.getElementsByTagName('button')];
+
+		const throwBadStatus = () => { throw Error('status response not 200') };
+
+		btnsExample.forEach(
+			({ id }, i) => Promise.all([
+				fetch(`/rule/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
+				fetch(`/test/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
+			]).then(([rule, test]) => {
+				// console.log([id, i, rule]);
+				btnsExample[i].onclick = () => {
+					taRule.value = rule;
+					taTest.value = test;
+				}
+				btnsExample[i].disabled = false;
+			}).catch((e) => {
+				console.error(e);
+				btnsExample[i].style.backgroundColor = 'tomato';
+			})
+		);
+
+		// fetch('/files/rule2_1.txt')
+		// 	.then((res) => res.text())
+		// 	.then((rule) => taRule.value = rule);
+
+		const textareas = [taRule, taTest, pConsole];
+		// console.log(textareas)
+
+		function outputsize([{ target: { style: { height } } }]) {
+			textareas.forEach((t) => t.style.height = height)
+		}
+		outputsize([{ target: { style: { height: '600px' } } }])
+
+		new MutationObserver(outputsize).observe(taRule, {
+			attributes: true, attributeFilter: ["style"]
+		})
+
+		const save = (filename, text) => {
+			let pom = document.createElement('a');
+			pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+			pom.setAttribute('download', filename);
+
+			let event = document.createEvent('MouseEvents');
+			event.initEvent('click', true, true);
+			pom.dispatchEvent(event);
+		}
+
+		document.getElementById('btn-save-rule').onclick = () =>
+			save(
+				new Date().toLocaleDateString() + '_'
+				+ new Date().toLocaleTimeString().replace(/:/g, '.')
+				+ '_rule.txt',
+				taRule.value
+			);
+
+		document.getElementById('btn-save-test').onclick = () =>
+			save(
+				new Date().toLocaleDateString() + '_'
+				+ new Date().toLocaleTimeString().replace(/:/g, '.')
+				+ '_rule.txt',
+				taRule.value
+			);
+
+		const load = (taCustom) => async ({ target: { files } }) => {
+			if (files.length !== 1) return;
+			taCustom.disabled = true;
+			taCustom.value = await files[0].text();
+			taCustom.disabled = false;
+		}
+
+		document.getElementById('btn-load-rule').children[0].onchange = load(taRule);
+		document.getElementById('btn-load-test').children[0].onchange = load(taTest);
+
+		document.getElementById('btn-clear-test').onclick = () => pConsole.innerText = '';
+
+		import { runTest } from './runtest.js';
+
+		if (!runTest) throw new Error('not found runTest in ./runtest.js');
+
+		const btnRun = document.getElementById('btn-run-test');
+		const btnStop = document.getElementById('btn-stop-test');
+		const inpStart = document.getElementById('inp-start');
+		const inpStop = document.getElementById('inp-stop');
+		const inpTimeout = document.getElementById('inp-timeout');
+
+		btnRun.disabled = false;
+
+		const printConsole = (...args) => {
+			const needScroll = pConsole.scrollHeight - pConsole.clientHeight === pConsole.scrollTop;
+			// console.log([pConsole.scrollHeight, pConsole.scrollTop, pConsole.clientHeight, pConsole.scrollHeight === pConsole.scrollTop + pConsole.clientHeight]);
+			// <span class="date">> ${new Date().toLocaleTimeString()}:</span> 
+			pConsole.innerHTML += `<span class="arrow"> &#10095; </span>${args.join(' ')}<br>`;
+			if (needScroll) {
+				pConsole.scroll(0, pConsole.scrollHeight - pConsole.clientHeight)
+			}
+		}
+
+		btnRun.onclick = async () => {
+			btnRun.disabled = true;
+			btnStop.disabled = false;
+
+			let isStop = false;
+
+			const print = (...args) => {
+				if (!isStop) {
+					printConsole(...args);
+				}
+			}
+
+			btnStop.onclick = () => {
+				isStop = false;
+				printConsole(`<span style="background-color: grey;"> Test stop </span>`);
+				btnRun.disabled = false;
+				btnStop.disabled = true;
+			}
+
+			const ans = await runTest(
+				taRule.value, taTest.value, print,
+				{
+					START: (inpStart.value ?? '').trim().length !== 0 ? inpStart.value : undefined,
+					STOP: (inpStop.value ?? '').trim().length !== 0 ? inpStop.value : undefined,
+					TIMEOUT: !Number.isNaN(parseInt(inpTimeout.value, 10)) ? parseInt(inpTimeout.value, 10) : undefined,
+				}
+			);
+
+			btnRun.disabled = false;
+			btnStop.disabled = true;
+		};
+	</script>
 </body>
+
 </html>

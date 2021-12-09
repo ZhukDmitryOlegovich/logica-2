@@ -3,26 +3,22 @@ import style from 'chalk';
 import express from 'express';
 
 const app = express();
-const PORT = process.env.PORT ?? 4000;
+const PORT = process.env.PORT ?? 3000;
 
 const getTime = () => new Date().toLocaleString('ru', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+const IS_URL = /(http\S+)/;
+
+// eslint-disable-next-line no-console
+const print = (...message: any[]) => console.log(
+	style.grey(getTime()),
+	...message.map((m) => (typeof m === 'string' ? m.replace(IS_URL, style.green('$1')) : m)),
+);
+
+app.use((req, _, next) => {
+	print(`${req.protocol}://${req.get('host')}${req.originalUrl}`);
+	next();
+});
 app.use(express.static('.'));
 
-// app.get('/', (req, res) => {
-// 	console.log(style.grey(getTime()), style.green(req.url), req.query);
-// 	res.sendFile(path.join(root, 'static', 'index.html'));
-// });
-
-// app.get('*', (req, res) => {
-// 	console.log(style.grey(getTime()), style.red(req.url));
-// 	res.sendStatus(404);
-// });
-
-app.listen(PORT, () => {
-	console.log(
-		style.grey(getTime()),
-		'Server listening',
-		style.green(`http://localhost:${PORT}`),
-	);
-});
+app.listen(PORT, () => print('Server listening', `http://localhost:${PORT}`));
