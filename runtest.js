@@ -45,6 +45,8 @@ const runTest = async (allRule, allTests, print, { TIMEOUT = 100, START = '01', 
             if (vc in accum[sc]) {
                 throw new Error(`Find a double transition: ${sc} ${vc}`);
             }
+            if (newvc === '-')
+                newvc = vc;
             accum[sc][vc] = { newsc, newvc, move };
             return accum;
         }, {});
@@ -67,7 +69,7 @@ const runTest = async (allRule, allTests, print, { TIMEOUT = 100, START = '01', 
                 }
                 const rule = rules[sc]?.[arr[pos] || '"'] ?? null;
                 if (!rule) {
-                    print(style('red', 'fail:'), '[', `${test},`, `${res},`, `${style('red', `${arr.join('').replace(/^"+|"+$/g, '')}`)},`, `${style('orange', `${pos - arr.findIndex((v) => v && v !== '"')}`)},`, 'status:', `${sc},`, 'rule:', style('bold', 'null'), ']');
+                    print(style('local-fail', 'fail:'), '[', `${test},`, `${style('local-ok', res)},`, `${style('local-fail', `${arr.join('').replace(/^"+|"+$/g, '')}`)},`, `${style('orange', `${pos - arr.findIndex((v) => v && v !== '"')}`)},`, 'status:', `${sc},`, style('local-fail', 'rule: <b>null</b>'), ']');
                     return false;
                 }
                 sc = rule.newsc;

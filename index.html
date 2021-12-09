@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="shortcut icon" href="./static/favicon.png">
 	<link rel="stylesheet" href="./static/reset.css">
 	<link rel="stylesheet" href="./static/main.css">
 	<title>Решение ДЗ по логике</title>
@@ -17,7 +18,7 @@
 			<h2>Задание №2 (Машина Тьюринга)</h2>
 		</div>
 		<div id="example" style="width: 500px; flex-wrap: wrap; user-select: none;">
-			<p>Примеры: <a href="" target="_blank">[добавить свой пример]</a></p>
+			<p>Примеры: <a href="https://github.com/ZhukDmitryOlegovich/logica-2/issues/new" target="_blank">[добавить свой пример]</a></p>
 			<button id="add-5" disabled>m + 5</button>
 			<button id="sg" disabled> sg(m) </button>
 			<button id="abs-sub" disabled>|m - n|</button>
@@ -50,7 +51,7 @@
 				<button id="btn-load-rule" onclick="this.children[0].click()">Загрузить правило
 					<input type="file" accept=".txt, .md" style="display: none;">
 				</button>
-				<a href="" style="margin: 8px;">Документация</a>
+				<a href="https://github.com/ZhukDmitryOlegovich/logica-2/#readme" target="_blank" style="margin: 8px;">Документация</a>
 			</div>
 			<textarea style="resize: vertical; width: 500px; min-height: 200px;" id="rule"></textarea>
 		</div>
@@ -69,8 +70,7 @@
 				<button id="btn-stop-test" disabled>Остановить тест</button>
 				<button id="btn-clear-test">Очистить консоль</button>
 			</div>
-			<p style="width: 500px; border: 1px solid #767676; overflow-y: scroll; font-family: monospace; white-space: pre-wrap;"
-				id="console"></p>
+			<p style="width: 500px;" id="console"></p>
 		</div>
 	</div>
 	<script type="module">
@@ -138,7 +138,7 @@
 			save(
 				new Date().toLocaleDateString() + '_'
 				+ new Date().toLocaleTimeString().replace(/:/g, '.')
-				+ '_rule.txt',
+				+ '_test.txt',
 				taRule.value
 			);
 

@@ -6,6 +6,10 @@ body {
 	box-sizing: border-box;
 }
 
+b {
+    font-weight: bold;
+}
+
 h1 {
 	font-size: 3em;
 	margin: 0.5em 0;
@@ -39,13 +43,22 @@ button {
 	width: 70px;
 }
 
+#console {
+	border: 1px solid #767676;
+	overflow-y: scroll;
+	font-family: monospace;
+	white-space: pre-wrap;
+	/* font-size: 110%; */
+	/* line-height: 1.125em; */
+}
+
 #console .date {
 	color: #a5a5a5;
 }
 
 #console .okey {
 	color: white;
-	background-color: darkgreen;
+	background-color: #02ad02;
 }
 
 #console .fail {
@@ -64,7 +77,7 @@ button {
 }
 
 #console .string {
-	color: darkgreen;
+	color: #02ad02;
 }
 
 #console .bad-string {
@@ -76,7 +89,7 @@ button {
 }
 
 #console .local-ok {
-	color: darkgreen;
+	color: #02ad02;
 }
 
 #console .local-fail {
