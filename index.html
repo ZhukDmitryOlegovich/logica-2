@@ -18,10 +18,21 @@
 			<h2>Задание №2 (Машина Тьюринга)</h2>
 		</div>
 		<div id="example" style="width: 500px; flex-wrap: wrap; user-select: none;">
-			<p>Примеры: <a href="https://github.com/ZhukDmitryOlegovich/logica-2/issues/new" target="_blank">[добавить свой пример]</a></p>
-			<button id="add-5" disabled>m + 5</button>
-			<button id="sg" disabled> sg(m) </button>
-			<button id="abs-sub" disabled>|m - n|</button>
+			<p>Примеры: <a href="https://github.com/ZhukDmitryOlegovich/logica-2/issues/new" target="_blank">[добавить
+					свой пример или сообщить об ошибке]</a></p>
+			<button id="add" disabled> m + n </button> <!-- 1 -->
+			<button id="div-5" disabled> [m / 5] </button> <!-- 2 -->
+			<button id="mod-5" disabled> m % 5 </button> <!-- 3 -->
+			<button id="sg" disabled> sg(m) </button> <!-- 4 -->
+			<button id="anti-sg" disabled> <span style="text-decoration: overline;">sg</span>(m) </button> <!-- 4 -->
+			<button id="max-5" disabled> max(m, 5) </button> <!-- 5 -->
+			<button id="min" disabled> min(m, n) </button> <!-- 6 -->
+			<button id="max" disabled> max(m, n) </button> <!-- 7 -->
+			<button id="sub" disabled> m ∸ n </button> <!-- 8 -->
+			<button id="anti-mod" disabled>5 % (m + 1)</button> <!-- 9 -->
+			<button id="abs-sub" disabled>|m - n|</button> <!-- 10 -->
+			<button id="add-5" disabled>m + 5</button> <!-- 11 -->
+			<button id="sub-5" disabled> m ∸ 5 </button> <!-- 12 -->
 		</div>
 		<table id="input" style="width: 500px; flex-wrap: wrap; user-select: none;">
 			<tr>
@@ -51,9 +62,11 @@
 				<button id="btn-load-rule" onclick="this.children[0].click()">Загрузить правило
 					<input type="file" accept=".txt, .md" style="display: none;">
 				</button>
-				<a href="https://github.com/ZhukDmitryOlegovich/logica-2/#readme" target="_blank" style="margin: 8px;">Документация</a>
+				<a href="https://github.com/ZhukDmitryOlegovich/logica-2/#readme" target="_blank"
+					style="margin: 8px 0 0 8px;">Документация</a>
 			</div>
-			<textarea style="resize: vertical; width: 500px; min-height: 200px;" id="rule"></textarea>
+			<!-- <textarea class="textarea" style="resize: vertical;" id="rule"></textarea> -->
+			<div contenteditable="true" class="textarea" style="resize: vertical;" id="rule"></div>
 		</div>
 		<div>
 			<div class="wrap-row" style="user-select: none;">
@@ -62,7 +75,8 @@
 					<input type="file" accept=".txt, .md" style="display: none;">
 				</button>
 			</div>
-			<textarea style="resize: none; width: 500px; min-height: 200px;" id="test"></textarea>
+			<!-- <textarea class="textarea" style="resize: none;" id="test"></textarea> -->
+			<div contenteditable="true" class="textarea" id="test"></div>
 		</div>
 		<div>
 			<div class="wrap-row" style="user-select: none;">
@@ -81,24 +95,113 @@
 
 		const btnsExample = [...divExample.getElementsByTagName('button')];
 
-		const throwBadStatus = () => { throw Error('status response not 200') };
+		const throwBadStatus = (url) => { throw Error(`status response not 200 for ${url}`) };
 
 		btnsExample.forEach(
 			({ id }, i) => Promise.all([
-				fetch(`./rule/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
-				fetch(`./test/${id}.txt`).then((res) => res.status === 200 ? res.text() : throwBadStatus()),
-			]).then(([rule, test]) => {
-				// console.log([id, i, rule]);
+				`./rule/${id}.txt`,
+				`./test/${id}.txt`,
+			].map(
+				(url) => fetch(url).then((res) => res.status === 200 ? res.text() : throwBadStatus(res.url))
+			)).then(([rule, test]) => {
+				rule = rule.replace(/\r\n/g, '\n');
+				test = test.replace(/\r\n/g, '\n');
 				btnsExample[i].onclick = () => {
-					taRule.value = rule;
-					taTest.value = test;
+					taRule.textContent = rule;
+					taTest.textContent = test;
 				}
 				btnsExample[i].disabled = false;
 			}).catch((e) => {
 				console.error(e);
-				btnsExample[i].style.backgroundColor = 'tomato';
+				btnsExample[i].classList.add('fail-load');
 			})
 		);
+
+		const listenerKeyDown = (event) => {
+			// return;
+			// console.log('-', event);
+			if (!(event.key == '/' && (event.ctrlKey || event.metaKey))) return;
+			const sel = document.getSelection();
+			// console.log(sel, range);
+			console.log('*', event);
+			const { target } = event;
+
+			const selectionStart = Math.min(sel.anchorOffset, sel.focusOffset);
+			const selectionEnd = Math.max(sel.anchorOffset, sel.focusOffset);
+			const range = sel.getRangeAt(0);
+			console.log(range.startOffset, range.endOffset);
+
+			// let lines = target.textContent.split('');
+			// lines.splice(selectionEnd, 0, '\x01');
+			// lines.splice(selectionStart, 0, '\x01');
+			// lines = lines.join('').split('\n');
+
+			// console.log(selectionStart, selectionEnd, target.textContent)
+
+			const from = target.textContent.slice(0, selectionStart).match(/\n/g)?.length ?? 0;
+			const to = (target.textContent.slice(0, selectionEnd).match(/\n/g)?.length ?? 0) + 1;
+
+			// console.log(from, to);
+
+			const lines = target.textContent.split('\n');
+			const rep = lines.slice(from, to);
+			const onlyCom = rep.every((line) => /^\s*(\/{2}|$)/.test(line.replace(/\x00/g, '')));
+			const newrep = rep.map(onlyCom
+				? (line) => line.replace(/^\s*\/{2} ?/, '')
+				: (line) => line.trim() ? `// ${line}` : line);
+			const newlines = [...lines];
+			newlines.splice(from, to - from, ...newrep);
+			// target.textContent = target.textContent;
+			target.textContent = newlines.join('\n');
+
+			// console.log(lines, rep, onlyCom);
+
+			// console.log(target.textContent);
+			// console.log(target.innerHTML);
+
+			// target.innerHTML = target.innerHTML.split('\n').map(
+			// 	(line) => line.replace(/\/{2}[^]*/, `<span class="comment">$&</span>`),
+			// ).join('\n');
+
+
+			// target.innerHTML = lines.join('\n');
+
+			target.selectionStart = selectionStart + newrep[0].length - rep[0].length;
+			target.selectionEnd = selectionEnd
+				+ newrep.reduce((a, _, i) => a + newrep[i].length - rep[i].length, 0);
+
+			let i = 0;
+			while (i < 100 && ((target.textContent.slice(0, target.selectionStart).match(/\n/g)?.length ?? 0) !== from)) {
+				target.selectionStart++;
+				i++;
+			}
+			while (i < 100 && ((target.textContent.slice(0, target.selectionEnd).match(/\n/g)?.length ?? 0) !== to - 1)) {
+				target.selectionEnd++;
+				i++;
+			}
+
+			// const s = Array.from(target.childNodes).find(
+			// 	(node) => node.textContent.length <= target.selectionStart
+			// 		|| (target.selectionStart - node.textContent.length, false)
+			// );
+			// const f = Array.from(target.childNodes).find(
+			// 	(node) => node.textContent.length <= target.selectionEnd
+			// 		|| (target.selectionEnd - node.textContent.length, false)
+			// );
+
+			// console.log(Array.from(target.childNodes).map((e) => e.textContent.length), f, s);
+			// console.log(target.textContent.length);
+
+			range.setStart(target.childNodes[0], target.selectionStart);
+			range.setEnd(target.childNodes[0], target.selectionEnd);
+			// setTimeout(() => {
+			// 	range.setStart(target.childNodes[1], 2);
+			// 	range.setEnd(target.childNodes[1], 3);
+			// }, 10);
+		}
+
+		taRule.addEventListener('keydown', listenerKeyDown);
+		taTest.addEventListener('keydown', listenerKeyDown);
 
 		// fetch('/files/rule2_1.txt')
 		// 	.then((res) => res.text())
@@ -131,7 +234,7 @@
 				new Date().toLocaleDateString() + '_'
 				+ new Date().toLocaleTimeString().replace(/:/g, '.')
 				+ '_rule.txt',
-				taRule.value
+				taRule.textContent
 			);
 
 		document.getElementById('btn-save-test').onclick = () =>
@@ -139,13 +242,13 @@
 				new Date().toLocaleDateString() + '_'
 				+ new Date().toLocaleTimeString().replace(/:/g, '.')
 				+ '_test.txt',
-				taRule.value
+				taRule.textContent
 			);
 
 		const load = (taCustom) => async ({ target: { files } }) => {
 			if (files.length !== 1) return;
 			taCustom.disabled = true;
-			taCustom.value = await files[0].text();
+			taCustom.textContent = await files[0].text();
 			taCustom.disabled = false;
 		}
 
@@ -196,7 +299,7 @@
 			}
 
 			const ans = await runTest(
-				taRule.value, taTest.value, print,
+				taRule.textContent, taTest.textContent, print,
 				{
 					START: (inpStart.value ?? '').trim().length !== 0 ? inpStart.value : undefined,
 					STOP: (inpStop.value ?? '').trim().length !== 0 ? inpStop.value : undefined,

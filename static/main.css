@@ -38,18 +38,40 @@ button {
 	margin: 5px;
 }
 
-#example > button {
-	font-family: monospace;
-	width: 80px;
+.textarea { 
+	width: 500px;
+	min-height: 200px;
+    /* background: url(http://i.imgur.com/2cOaJ.png);
+    background-attachment: local;
+    background-repeat: no-repeat;
+    padding-left: 35px;
+    padding-top: 10px;
+    border-color:#ccc;
+	font-size: 105%; */
 }
 
-#console {
+.comment {
+	color: gray;
+	font-style: italic;
+}
+
+#example > button {
+	font-family: monospace;
+	/* width: 80px; */
+}
+
+#example > button.fail-load {
+	/* background-color: #ff5b5b; */
+}
+
+#console, #test, #rule {
+	padding: 2px;
 	border: 1px solid #767676;
-	overflow-y: scroll;
+	overflow-y: auto;
 	font-family: monospace;
 	white-space: pre-wrap;
 	/* font-size: 110%; */
-	/* line-height: 1.125em; */
+	line-height: 15px;
 }
 
 #console .date {
