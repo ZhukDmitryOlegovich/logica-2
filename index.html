@@ -63,7 +63,7 @@
 					<input type="file" accept=".txt, .md" style="display: none;">
 				</button>
 				<a href="https://github.com/ZhukDmitryOlegovich/logica-2/#readme" target="_blank"
-					style="margin: 8px;">Документация</a>
+					style="margin: 8px 0 0 8px;">Документация</a>
 			</div>
 			<textarea style="resize: vertical; width: 500px; min-height: 200px;" id="rule"></textarea>
 		</div>
@@ -151,7 +151,7 @@
 				new Date().toLocaleDateString() + '_'
 				+ new Date().toLocaleTimeString().replace(/:/g, '.')
 				+ '_test.txt',
-				taRule.value
+				taTest.value
 			);
 
 		const load = (taCustom) => async ({ target: { files } }) => {
